@@ -1,9 +1,8 @@
 import getCaretCoordinates from 'textarea-caret-position';
-import Promise from 'bluebird';
 import React from 'react';
 
 import ReactMLContextMenu from './ReactMLContextMenu';
-import ReactMLSuggest from './ReactMLSuggest';
+import ReactMLSuggestMenu from './ReactMLSuggestMenu';
 
 function explode(str, a, b) {
   if(a > b) {
@@ -20,13 +19,15 @@ class ReactMLEditor extends React.Component {
   static displayName = 'ReactMLEditor';
 
   static propTypes = {
+    ContextMenu: React.PropTypes.any,
+    SuggestMenu: React.PropTypes.any,
     onChange: React.PropTypes.func,
-    suggest: React.PropTypes.func,
   };
 
   static defaultProps = {
+    ContextMenu: ReactMLContextMenu,
+    SuggestMenu: ReactMLSuggestMenu,
     onChange: () => void 0,
-    suggest: () => Promise.resolve([]),
   };
 
   constructor(...args) {
@@ -154,31 +155,20 @@ class ReactMLEditor extends React.Component {
   }
 
   render() {
-    const { suggest } = this.props;
+    const { SuggestMenu, ContextMenu } = this.props;
     const { content, suggesting, caretCoordinates } = this.state;
     const selection = this.getCurrentSelection();
     const selecting = typeof selection === 'string' && selection.length > 0;
-    const suggestBox = <div style={{
-      position: 'absolute',
-      top: caretCoordinates.top,
-      left: caretCoordinates.left,
-    }}>
-      <ReactMLSuggest
-        onAcceptSuggest={(suggestion) => this.onAcceptSuggest(suggestion)}
-        onRejectSuggest={() => this.onRejectSuggest()}
-        suggest={suggest}
-      />
-    </div>;
-    const selectBox = <div style={{
-      position: 'absolute',
-      top: caretCoordinates.top,
-      left: caretCoordinates.left,
-    }}>
-      <ReactMLContextMenu
-        onTransformSelection={(transformedSelection) => this.onTransformSelection(transformedSelection)}
-        selection={selection}
-       />
-    </div>;
+    const suggestMenu = <SuggestMenu
+      caretCoordinates={caretCoordinates}
+      onAcceptSuggest={(suggestion) => this.onAcceptSuggest(suggestion)}
+      onRejectSuggest={() => this.onRejectSuggest()}
+    />;
+    const contextMenu = <ContextMenu
+      caretCoordinates={caretCoordinates}
+      onTransformSelection={(transformedSelection) => this.onTransformSelection(transformedSelection)}
+      selection={selection}
+     />;
     return <div className='reactml-editor'>
       <textarea
         onChange={(e) => this.onTextAreaChange(e)}
@@ -195,8 +185,8 @@ class ReactMLEditor extends React.Component {
         }}
         value={content}
       />
-      { selecting ? selectBox : null }
-      { suggesting && !selecting ? suggestBox : null }
+      { selecting ? contextMenu : null }
+      { suggesting && !selecting ? suggestMenu : null }
     </div>;
   }
 }

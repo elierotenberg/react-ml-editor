@@ -3,16 +3,21 @@ import ReactML from 'react-ml';
 
 import ReactMLEditor from './ReactMLEditor';
 import ReactMLPreview from './ReactMLPreview';
+import ReactMLContextMenu from './ReactMLContextMenu';
+import ReactMLSuggestMenu from './ReactMLSuggestMenu';
 
 class ReactMLSplitEditor extends React.Component {
   static propTypes = {
+    ContextMenu: React.PropTypes.any,
+    SuggestMenu: React.PropTypes.any,
     components: React.PropTypes.object,
     flexDirection: React.PropTypes.oneOf(['row', 'row-reverse', 'column', 'column-reverse']),
     onChange: React.PropTypes.func,
-    suggest: React.PropTypes.func,
   };
 
   static defaultProps = {
+    ContextMenu: ReactMLContextMenu,
+    SuggestMenu: ReactMLSuggestMenu,
     components: ReactML.presets.basic,
     onChange: () => void 0,
     flexDirection: 'row',
@@ -33,7 +38,7 @@ class ReactMLSplitEditor extends React.Component {
   }
 
   render() {
-    const { components, flexDirection, suggest } = this.props;
+    const { ContextMenu, SuggestMenu, components, flexDirection } = this.props;
     const { source } = this.state;
     return <div
       className='reactml-split-editor'
@@ -47,7 +52,11 @@ class ReactMLSplitEditor extends React.Component {
           flexBasis: '50%',
         }}
       >
-        <ReactMLEditor onChange={(nextSource) => this.onEditorChange(nextSource)} suggest={suggest} />
+        <ReactMLEditor
+          ContextMenu={ContextMenu}
+          SuggestMenu={SuggestMenu}
+          onChange={(nextSource) => this.onEditorChange(nextSource)}
+        />
       </div>
       <div className='reactml-split-editor-preview'
         style={{

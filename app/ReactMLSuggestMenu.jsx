@@ -20,18 +20,26 @@ const selectedSuggestionStyle = {
   backgroundColor: 'red',
 };
 
-class ReactMLSuggest extends React.Component {
+class ReactMLSuggestMenu extends React.Component {
 
   static propTypes = {
+    caretCoordinates: React.PropTypes.shape({
+      top: React.PropTypes.number,
+      left: React.PropTypes.number,
+    }),
     onAcceptSuggest: React.PropTypes.func,
     onRejectSuggest: React.PropTypes.func,
     suggest: React.PropTypes.func,
   };
 
   static defaultProps = {
+    caretCoordinates: {
+      top: 0,
+      left: 0,
+    },
     onAcceptSuggest: () => void 0,
     onRejectSuggest: () => void 0,
-    suggest: () => [],
+    suggest: () => Promise.resovle([]),
   };
 
   constructor(...args) {
@@ -144,10 +152,16 @@ class ReactMLSuggest extends React.Component {
   }
 
   render() {
+    const { caretCoordinates } = this.props;
     const { currentInput, selectionIndex, suggestedTags } = this.state;
     return <form
-      className='reactml-suggest'
+      className='reactml-suggest-menu'
       onSubmit={(e) => this.acceptSuggestion(e)}
+      style={{
+        position: 'absolute',
+        top: caretCoordinates.top,
+        left: caretCoordinates.left,
+      }}
     >
       <input
         onChange={(e) => this.onInputChange(e)}
@@ -174,4 +188,4 @@ class ReactMLSuggest extends React.Component {
   }
 }
 
-export default ReactMLSuggest;
+export default ReactMLSuggestMenu;

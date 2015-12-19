@@ -5,10 +5,10 @@ import ReactDOM from 'react-dom';
 import ReactML from 'react-ml';
 import ReactMLSplitEditor from '../ReactMLSplitEditor';
 
-import suggest from './suggest';
+import WikipediaSuggestMenu from './WikipediaSuggestMenu';
 import ReactMLWikipedia from './ReactMLWikipedia';
 
-ReactDOM.render(<ReactMLSplitEditor components={Object.assign({}, ReactML.presets.basic, {
+const components = Object.assign({}, ReactML.presets.basic, {
   'Wikipedia': (attribs, children) =>
     <ReactMLWikipedia>{children.map(({ type, data }) => {
       if(type === 'text') {
@@ -17,4 +17,9 @@ ReactDOM.render(<ReactMLSplitEditor components={Object.assign({}, ReactML.preset
       return '';
     }).join('')}</ReactMLWikipedia>
   ,
-})} suggest={suggest} />, document.getElementById('app'));
+});
+
+ReactDOM.render(<ReactMLSplitEditor
+  SuggestMenu={WikipediaSuggestMenu}
+  components={components}
+/>, document.getElementById('app'));
