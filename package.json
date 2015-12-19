@@ -86,7 +86,7 @@
     "mocha": "^2.3.4",
     "react": "^0.14.3",
     "react-dom": "^0.14.3",
-    "react-ml": "^0.3.4",
+    "react-ml": "^0.4.1",
     "rimraf": "^2.4.4",
     "run-sequence": "^1.1.5",
     "should": "^8.0.1",
@@ -106,6 +106,6 @@
   "peerDependencies": {
     "react": "^0.14.3",
     "react-dom": "^0.14.3",
-    "react-ml": "^0.3.4"
+    "react-ml": "^0.4.1"
   }
 }

@@ -16,8 +16,16 @@ const KEY_CODES = {
   DOWN_ARROW: 40,
 };
 
+const googleBlue = '#2196f3';
+
 const selectedSuggestionStyle = {
-  backgroundColor: 'red',
+  color: '#fff',
+  backgroundColor: googleBlue,
+};
+
+const suggestionStyle = {
+  padding: 0,
+  listStyleType: 'none',
 };
 
 class ReactMLSuggestMenu extends React.Component {
@@ -27,8 +35,7 @@ class ReactMLSuggestMenu extends React.Component {
       top: React.PropTypes.number,
       left: React.PropTypes.number,
     }),
-    onAcceptSuggest: React.PropTypes.func,
-    onRejectSuggest: React.PropTypes.func,
+    onTransformSuggestion: React.PropTypes.func,
     suggest: React.PropTypes.func,
   };
 
@@ -37,8 +44,7 @@ class ReactMLSuggestMenu extends React.Component {
       top: 0,
       left: 0,
     },
-    onAcceptSuggest: () => void 0,
-    onRejectSuggest: () => void 0,
+    onTransformSuggestion: () => void 0,
     suggest: () => Promise.resovle([]),
   };
 
@@ -68,7 +74,7 @@ class ReactMLSuggestMenu extends React.Component {
       e.preventDefault();
       e.stopPropagation();
     }
-    const { onAcceptSuggest } = this.props;
+    const { onTransformSuggestion } = this.props;
     const { settled, selectionIndex, suggestedTags } = this.state;
     if(settled) {
       return void 0;
@@ -79,7 +85,7 @@ class ReactMLSuggestMenu extends React.Component {
     }
     this.setState({ settled: true });
     const { suggestion } = suggestedTag;
-    return onAcceptSuggest(suggestion);
+    return onTransformSuggestion(suggestion);
   }
 
   rejectSuggestion(e) {
@@ -87,13 +93,13 @@ class ReactMLSuggestMenu extends React.Component {
       e.preventDefault();
       e.stopPropagation();
     }
-    const { onRejectSuggest } = this.props;
+    const { onTransformSuggestion } = this.props;
     const { settled } = this.state;
     if(settled) {
       return void 0;
     }
     this.setState({ settled: true });
-    return onRejectSuggest();
+    return onTransformSuggestion('@');
   }
 
   moveSelectionTo(e, selectionIndex) {
@@ -159,18 +165,32 @@ class ReactMLSuggestMenu extends React.Component {
       onSubmit={(e) => this.acceptSuggestion(e)}
       style={{
         position: 'absolute',
-        top: caretCoordinates.top,
+        top: caretCoordinates.top - 2,
         left: caretCoordinates.left,
+        marginTop: '0.5em',
+        width: '20em',
+        border: '1px solid #333',
       }}
     >
       <input
         onChange={(e) => this.onInputChange(e)}
         onKeyDown={(e) => this.onKeyDown(e)}
         ref='input'
+        style={{
+          width: '100%',
+          fontFamily: 'monospace',
+          border: 0,
+        }}
         type='text'
         value={currentInput}
       />
-      <ul>
+      <ul
+        style={{
+          width: '100%',
+          padding: 0,
+          margin: 0,
+        }}
+      >
         {suggestedTags.map(({ label }, index) =>
           <li
             key={index}
@@ -178,7 +198,7 @@ class ReactMLSuggestMenu extends React.Component {
               this.setState({ selectionIndex: index });
               this.acceptSuggestion(e);
             }}
-            style={index === selectionIndex ? selectedSuggestionStyle : {}}
+            style={Object.assign({}, suggestionStyle, index === selectionIndex ? selectedSuggestionStyle : {})}
           >
             {label}
           </li>

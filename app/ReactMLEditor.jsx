@@ -1,31 +1,23 @@
-import getCaretCoordinates from 'textarea-caret-position';
 import React from 'react';
 
 import ReactMLContextMenu from './ReactMLContextMenu';
+import ReactMLHelpMenu from './ReactMLHelpMenu';
 import ReactMLSuggestMenu from './ReactMLSuggestMenu';
-
-function explode(str, a, b) {
-  if(a > b) {
-    return explode(str, b, a);
-  }
-  return [
-    str.slice(0, a),
-    str.slice(a, b),
-    str.slice(b, str.length),
-  ];
-}
+import getCaretCoordinates from 'textarea-caret-position';
 
 class ReactMLEditor extends React.Component {
   static displayName = 'ReactMLEditor';
 
   static propTypes = {
     ContextMenu: React.PropTypes.any,
+    HelpMenu: React.PropTypes.any,
     SuggestMenu: React.PropTypes.any,
     onChange: React.PropTypes.func,
   };
 
   static defaultProps = {
     ContextMenu: ReactMLContextMenu,
+    HelpMenu: ReactMLHelpMenu,
     SuggestMenu: ReactMLSuggestMenu,
     onChange: () => void 0,
   };
@@ -33,160 +25,166 @@ class ReactMLEditor extends React.Component {
   constructor(...args) {
     super(...args);
     this.state = {
-      content: '',
+      value: '',
       suggesting: false,
-      beforeSuggest: void 0,
-      afterSuggest: void 0,
       selectionStart: void 0,
       selectionEnd: void 0,
-      caretCoordinates: {
-        top: void 0,
-        left: void 0,
-      },
     };
+    this.selectionTimeout = null;
+  }
+
+  componentWillUnmount() {
+    if(this.selectionTimeout !== null) {
+      clearTimeout(this.selectionTimeout);
+    }
+  }
+
+  setSelectionRange(selectionStart, selectionEnd) {
+    const { selectionArea } = this.refs;
+    this.setState({
+      selectionEnd,
+      selectionStart,
+    });
+    selectionArea.setSelectionRange(selectionStart, selectionEnd);
+  }
+
+  focusAtSelection(selectionStart, selectionEnd) {
+    const { selectionArea } = this.refs;
+    if(this.selectionTimeout !== null) {
+      clearTimeout(this.selectionTimeout);
+    }
+    selectionArea.focus();
+    this.selectionTimeout = setTimeout(() => this.setSelectionRange(selectionStart, selectionEnd), 0);
+  }
+
+  setValue(value) {
+    const { onChange } = this.props;
+    this.setState({ value });
+    onChange(value);
   }
 
   getCurrentSelection() {
-    const { selectionStart, selectionEnd, content } = this.state;
-    if(selectionStart === void 0 || selectionEnd === void 0) {
-      return null;
-    }
-    const [, currentSelection] = explode(content, selectionStart, selectionEnd);
-    return currentSelection;
-  }
-
-  onTransformSelection(transformedSelection) {
-    const { textarea } = this.refs;
-    const { selectionStart, selectionEnd, content } = this.state;
-    const [beforeCaret, , afterCaret] = explode(content, selectionStart, selectionEnd);
-    const nextContent = beforeCaret + transformedSelection + afterCaret;
-    this.setState({
-      content: nextContent,
-      selectionEnd: selectionStart + nextContent.length,
-    });
-    textarea.setSelectionRange(selectionStart, selectionEnd + nextContent.length);
-  }
-
-  onTextAreaChange(e) {
-    const { onChange } = this.props;
-    const content = e.target.value;
-    this.setState({ content });
-    this.updateCaretPosition();
-    onChange(content);
-  }
-
-  onTextAreaSelect() {
-    const { textarea } = this.refs;
-    const { selectionStart, selectionEnd } = textarea;
-    this.setState({
-      selectionStart,
+    const {
       selectionEnd,
-    });
+      selectionStart,
+      value,
+    } = this.state;
+    if(selectionEnd === void 0 || selectionStart === void 0) {
+      return void 0;
+    }
+    return value.slice(selectionStart, selectionEnd);
   }
 
   onKeyPress(e) {
-    this.updateCaretPosition();
     const { key } = e;
-    if(key === '@') {
-      const { textarea } = this.refs;
-      const { value } = e.target;
-      const { selectionEnd } = textarea;
-      const beforeSuggest = value.substr(0, selectionEnd);
-      const afterSuggest = value.substr(selectionEnd);
-      this.setState({
-        suggesting: true,
-        beforeSuggest,
-        afterSuggest,
-      });
-    }
-    else {
-      this.setState({
-        suggesting: false,
-        beforeSuggest: void 0,
-        afterSuggest: void 0,
-      });
-    }
+    this.setState({ suggesting: key === '@' });
   }
 
   onKeyDown() {
-    this.updateCaretPosition();
+    this.setState({ suggesting: false });
+  }
+
+  onChange(e) {
+    const { target } = e;
+    const { value } = target;
+    this.setValue(value);
+  }
+
+  onSelect(e) {
+    const { target } = e;
+    const { selectionEnd, selectionStart } = target;
+    this.setSelectionRange(selectionStart, selectionEnd);
+  }
+
+  onTransformSelection(transformedSelection) {
+    const {
+      selectionEnd,
+      selectionStart,
+      value,
+    } = this.state;
+    const beforeSelection = value.slice(0, selectionStart);
+    const afterSelection = value.slice(selectionEnd, value.length);
+    this.setValue(beforeSelection + transformedSelection + afterSelection);
+    this.focusAtSelection(selectionStart, selectionStart + transformedSelection.length);
+  }
+
+  onTransformSuggestion(transformedSuggestion) {
+    const {
+      selectionEnd,
+      selectionStart,
+      value,
+    } = this.state;
+    const beforeSelection = value.slice(0, selectionStart);
+    const afterSelection = value.slice(selectionEnd + 1, value.length);
     this.setState({
       suggesting: false,
-      beforeSuggest: void 0,
-      afterSuggest: void 0,
     });
-  }
-
-  updateCaretPosition() {
-    const { textarea } = this.refs;
-    const caretCoordinates = getCaretCoordinates(textarea, textarea.selectionEnd);
-    this.setState({ caretCoordinates });
-  }
-
-  setCaretPosition(position) {
-    const { textarea } = this.refs;
-    textarea.setSelectionRange(position, position);
-    textarea.focus();
-  }
-
-  onAcceptSuggest(suggestion) {
-    const { onChange } = this.props;
-    const { beforeSuggest, afterSuggest } = this.state;
-    const beforeCaret = beforeSuggest + suggestion;
-    const content = beforeCaret + afterSuggest;
-    this.setState({
-      content,
-      suggesting: false,
-      beforeSuggest: void 0,
-      afterSuggest: void 0,
-    }, () => {
-      this.setCaretPosition(beforeCaret.length);
-      onChange(content);
-    });
-  }
-
-  onRejectSuggest() {
-    const { beforeSuggest } = this.state;
-    this.setState({
-      suggesting: false,
-      beforeSuggest: void 0,
-      afterSuggest: void 0,
-    }, () => this.setCaretPosition(beforeSuggest.length + 1));
+    this.setValue(beforeSelection + transformedSuggestion + afterSelection);
+    this.focusAtSelection(
+      selectionStart + transformedSuggestion.length,
+      selectionStart + transformedSuggestion.length,
+    );
   }
 
   render() {
-    const { SuggestMenu, ContextMenu } = this.props;
-    const { content, suggesting, caretCoordinates } = this.state;
+    const { selectionArea } = this.refs;
+    const caretCoordinates = selectionArea ? getCaretCoordinates(selectionArea, selectionArea.selectionEnd) : {
+      top: 0,
+      left: 0,
+    };
+    const {
+      ContextMenu,
+      HelpMenu,
+      SuggestMenu,
+    } = this.props;
+
+    const {
+      selectionEnd,
+      selectionStart,
+      suggesting,
+      value,
+    } = this.state;
+
     const selection = this.getCurrentSelection();
-    const selecting = typeof selection === 'string' && selection.length > 0;
-    const suggestMenu = <SuggestMenu
-      caretCoordinates={caretCoordinates}
-      onAcceptSuggest={(suggestion) => this.onAcceptSuggest(suggestion)}
-      onRejectSuggest={() => this.onRejectSuggest()}
-    />;
+    const selecting = selection !== void 0 && selection.length > 0;
+
     const contextMenu = <ContextMenu
       caretCoordinates={caretCoordinates}
       onTransformSelection={(transformedSelection) => this.onTransformSelection(transformedSelection)}
       selection={selection}
      />;
-    return <div className='reactml-editor'>
+
+    const suggestMenu = <SuggestMenu
+      caretCoordinates={caretCoordinates}
+      onTransformSuggestion={(transformedSuggestion) => this.onTransformSuggestion(transformedSuggestion)}
+    />;
+
+    return <div
+      className='reactml-editor'
+      style={{
+        position: 'relative',
+      }}
+    >
       <textarea
-        onChange={(e) => this.onTextAreaChange(e)}
+        onChange={(e) => this.onChange(e)}
         onKeyDown={(e) => this.onKeyDown(e)}
         onKeyPress={(e) => this.onKeyPress(e)}
-        onResize={() => this.updateCaretPosition()}
-        onSelect={(e) => this.onTextAreaSelect(e)}
-        ref='textarea'
+        onResize={() => this.onResize()}
+        onSelect={(e) => this.onSelect(e)}
+        ref='selectionArea'
+        selectionEnd={selectionEnd}
+        selectionStart={selectionStart}
         style={{
           height: '100%',
           width: '100%',
           resize: 'none',
           overflow: 'auto',
         }}
-        value={content}
+        value={value}
       />
       { selecting ? contextMenu : null }
       { suggesting && !selecting ? suggestMenu : null }
+      <HelpMenu />
     </div>;
   }
 }
