@@ -1,6 +1,6 @@
 {
   "name": "react-ml-editor",
-  "version": "0.0.0",
+  "version": "0.0.0-dev",
   "description": "ReactML editor with live preview and suggest-completion.",
   "main": "dist/node/prod/index.js",
   "browser": "dist/browser/prod/index.js",
