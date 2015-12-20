@@ -1,8 +1,8 @@
 import React from 'react';
 
-import ReactMLContextMenu from './ReactMLContextMenu';
-import ReactMLHelpMenu from './ReactMLHelpMenu';
-import ReactMLSuggestMenu from './ReactMLSuggestMenu';
+import ReactMLEditorBasicContextMenu from './ReactMLEditorBasicContextMenu';
+import ReactMLEditorBasicHelpMenu from './ReactMLEditorBasicHelpMenu';
+import ReactMLEditorBasicSuggestMenu from './ReactMLEditorBasicSuggestMenu';
 import getCaretCoordinates from 'textarea-caret-position';
 
 class ReactMLEditor extends React.Component {
@@ -16,9 +16,9 @@ class ReactMLEditor extends React.Component {
   };
 
   static defaultProps = {
-    ContextMenu: ReactMLContextMenu,
-    HelpMenu: ReactMLHelpMenu,
-    SuggestMenu: ReactMLSuggestMenu,
+    ContextMenu: ReactMLEditorBasicContextMenu,
+    HelpMenu: ReactMLEditorBasicHelpMenu,
+    SuggestMenu: ReactMLEditorBasicSuggestMenu,
     onChange: () => void 0,
   };
 

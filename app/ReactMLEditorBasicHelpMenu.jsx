@@ -38,7 +38,7 @@ const helpers = [
   ],
 ];
 
-class ReactMLHelpMenu extends React.Component {
+class ReactMLEditorBasicContextMenu extends React.Component {
   constructor(...args) {
     super(...args);
     this.state = {
@@ -134,4 +134,4 @@ class ReactMLHelpMenu extends React.Component {
   }
 }
 
-export default ReactMLHelpMenu;
+export default ReactMLEditorBasicContextMenu;

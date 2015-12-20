@@ -28,7 +28,7 @@ const suggestionStyle = {
   listStyleType: 'none',
 };
 
-class ReactMLSuggestMenu extends React.Component {
+class ReactMLEditorBasicSuggestMenu extends React.Component {
 
   static propTypes = {
     caretCoordinates: React.PropTypes.shape({
@@ -167,7 +167,6 @@ class ReactMLSuggestMenu extends React.Component {
         position: 'absolute',
         top: caretCoordinates.top - 2,
         left: caretCoordinates.left,
-        marginTop: '0.5em',
         width: '20em',
         border: '1px solid #333',
       }}
@@ -208,4 +207,4 @@ class ReactMLSuggestMenu extends React.Component {
   }
 }
 
-export default ReactMLSuggestMenu;
+export default ReactMLEditorBasicSuggestMenu;

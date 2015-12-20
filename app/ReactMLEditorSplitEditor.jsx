@@ -2,13 +2,15 @@ import React from 'react';
 import ReactML from 'react-ml';
 
 import ReactMLEditor from './ReactMLEditor';
-import ReactMLPreview from './ReactMLPreview';
-import ReactMLContextMenu from './ReactMLContextMenu';
-import ReactMLSuggestMenu from './ReactMLSuggestMenu';
+import ReactMLEditorPreview from './ReactMLEditorPreview';
+import ReactMLEditorBasicContextMenu from './ReactMLEditorBasicContextMenu';
+import ReactMLEditorBasicHelpMenu from './ReactMLEditorBasicHelpMenu';
+import ReactMLEditorBasicSuggestMenu from './ReactMLEditorBasicSuggestMenu';
 
-class ReactMLSplitEditor extends React.Component {
+class ReactMLEditorSplitEditor extends React.Component {
   static propTypes = {
     ContextMenu: React.PropTypes.any,
+    HelpMenu: React.PropTypes.any,
     SuggestMenu: React.PropTypes.any,
     components: React.PropTypes.object,
     flexDirection: React.PropTypes.oneOf(['row', 'row-reverse', 'column', 'column-reverse']),
@@ -16,8 +18,9 @@ class ReactMLSplitEditor extends React.Component {
   };
 
   static defaultProps = {
-    ContextMenu: ReactMLContextMenu,
-    SuggestMenu: ReactMLSuggestMenu,
+    ContextMenu: ReactMLEditorBasicContextMenu,
+    HelpMenu: ReactMLEditorBasicHelpMenu,
+    SuggestMenu: ReactMLEditorBasicSuggestMenu,
     components: ReactML.presets.basic,
     onChange: () => void 0,
     flexDirection: 'row',
@@ -63,10 +66,10 @@ class ReactMLSplitEditor extends React.Component {
           flexBasis: '50%',
         }}
       >
-        <ReactMLPreview components={components} source={source} />
+        <ReactMLEditorPreview components={components} source={source} />
       </div>
     </div>;
   }
 }
 
-export default ReactMLSplitEditor;
+export default ReactMLEditorSplitEditor;

@@ -22,7 +22,7 @@ const basicTransformers = [
   },
 ];
 
-class ReactMLBasicContextMenu extends React.Component {
+class ReactMLEditorBasicContextMenu extends React.Component {
   static propTypes = {
     caretCoordinates: React.PropTypes.shape({
       top: React.PropTypes.number,
@@ -78,4 +78,4 @@ class ReactMLBasicContextMenu extends React.Component {
   }
 }
 
-export default ReactMLBasicContextMenu;
+export default ReactMLEditorBasicContextMenu;

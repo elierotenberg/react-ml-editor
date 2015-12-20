@@ -10,7 +10,7 @@ function attempt(fn) {
   }
 }
 
-class ReactMLPreview extends React.Component {
+class ReactMLEditorPreview extends React.Component {
   static propTypes = {
     components: React.PropTypes.object,
     source: React.PropTypes.string,
@@ -44,4 +44,4 @@ class ReactMLPreview extends React.Component {
   }
 }
 
-export default ReactMLPreview;
+export default ReactMLEditorPreview;

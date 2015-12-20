@@ -1,17 +1,17 @@
 import 'babel-polyfill';
 
-import ReactMLContextMenu from './ReactMLContextMenu';
 import ReactMLEditor from './ReactMLEditor';
-import ReactMLHelpMenu from './ReactMLHelpMenu';
-import ReactMLPreview from './ReactMLPreview';
-import ReactMLSplitEditor from './ReactMLSplitEditor';
-import ReactMLSuggestMenu from './ReactMLSuggestMenu';
+import ReactMLEditorBasicContextMenu from './ReactMLEditorBasicContextMenu';
+import ReactMLEditorBasicHelpMenu from './ReactMLEditorBasicHelpMenu';
+import ReactMLEditorBasicSuggestMenu from './ReactMLEditorBasicSuggestMenu';
+import ReactMLEditorPreview from './ReactMLEditorPreview';
+import ReactMLEditorSplitEditor from './ReactMLEditorSplitEditor';
 
 export default {
-  ReactMLContextMenu,
   ReactMLEditor,
-  ReactMLHelpMenu,
-  ReactMLPreview,
-  ReactMLSplitEditor,
-  ReactMLSuggestMenu,
+  ReactMLEditorBasicContextMenu,
+  ReactMLEditorBasicHelpMenu,
+  ReactMLEditorBasicSuggestMenu,
+  ReactMLEditorPreview,
+  ReactMLEditorSplitEditor,
 };
